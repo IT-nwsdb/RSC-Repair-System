@@ -1,0 +1,441 @@
+/* Global Styles */
+:root {
+    --primary-blue: #2a2a72;
+    --secondary-blue: #009ffd;
+    --accent: #00eaff;
+    --light-gray: #f8f9fa;
+    --dark-gray: #343a40;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+
+/* Login Page Styles */
+.login-page {
+    background: linear-gradient(-45deg, #2a2a72, #009ffd, #2a2a72, #009ffd);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.login-card {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    animation: fadeIn 1.2s ease forwards;
+    color: white;
+    padding: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+/* Dashboard Styles */
+.dashboard-header {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-section {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+}
+
+.badge-status {
+    padding: 0.4rem 0.6rem;
+    font-weight: 500;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+/* Tabs */
+.nav-tabs .nav-link.active {
+    font-weight: 600;
+    border-bottom: 3px solid var(--primary-blue);
+}
+
+/* Modal */
+.modal-header {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+/* Hide all pages initially */
+.page {
+    display: none;
+}
+
+/* Show active page */
+.page.active {
+    display: block;
+}
+
+/* Form styles */
+.form-control, .form-select {
+    background-color: white;
+    color: #212529;
+    border: 1px solid #ced4da;
+}
+
+/* Password toggle icon */
+.password-input-group {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 38px;
+    cursor: pointer;
+    color: #6c757d;
+    z-index: 5;
+    height: 20px;
+    width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+}
+
+/* System buttons */
+.system-btn.active {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+/* Form labels */
+.form-label {
+    color: #212529;
+    font-weight: 500;
+}
+
+/* Login form labels */
+.login-card .form-label {
+    color: white !important;
+}
+
+/* Dashboard form sections */
+.form-section h5 {
+    color: var(--primary-blue);
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-blue);
+    margin-bottom: 1rem;
+}
+
+/* Auto-fill details box */
+.autofill-box {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--primary-blue);
+}
+
+/* Login page title */
+.login-title {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Login subtitle */
+.login-subtitle {
+    font-size: 1rem;
+    opacity: 0.8;
+    margin-bottom: 1.5rem;
+}
+
+/* Password input with icon */
+.password-with-icon {
+    padding-right: 2.5rem !important;
+}
+
+/* Additional item section */
+.additional-item {
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #f8f9fa;
+}
+
+.additional-item-header {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.additional-item-content {
+    display: none;
+}
+
+.additional-item.active .additional-item-content {
+    display: block;
+}
+
+/* TLS Connection indicator */
+.tls-indicator {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(0, 255, 0, 0.1);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.tls-indicator i {
+    color: #28a745;
+    margin-right: 5px;
+}
+
+/* Print styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .print-section, .print-section * {
+        visibility: visible;
+    }
+    .print-section {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        font-size: 12px !important;
+    }
+    .no-print {
+        display: none !important;
+    }
+    h1 {
+        font-size: 16px !important;
+    }
+    h2, h3 {
+        font-size: 14px !important;
+    }
+    table {
+        font-size: 11px !important;
+    }
+    th, td {
+        padding: 4px !important;
+    }
+}
+
+/* Committee approval styles */
+.committee-member-signature {
+    border-bottom: 1px dotted #000;
+    width: 200px;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.mr-pr-box {
+    border: 1px solid #000;
+    width: 150px;
+    height: 30px;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+/* Received items modal table */
+.received-items-table tbody tr {
+    cursor: pointer;
+}
+
+.received-items-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Serial numbers container */
+.serial-numbers-container {
+    margin-top: 10px;
+    display: none;
+}
+
+.serial-number-input {
+    margin-bottom: 5px;
+}
+
+.serial-number-select {
+    width: 100%;
+}
+
+/* Serial search results */
+.serial-search-results {
+    margin-top: 20px;
+}
+
+.serial-details-card {
+    border-left: 4px solid var(--primary-blue);
+}
+/* System Tracking Styles */
+.system-tracking-card {
+    border-left: 4px solid var(--primary-blue);
+}
+
+.tracking-history-table th {
+    background-color: var(--light-gray);
+}
+
+#systemTrackingResults {
+    animation: fadeIn 0.5s ease;
+}
+/* VAT input styling */
+#vatPercentage {
+    text-align: right;
+}
+
+/* Print styles for VAT */
+@media print {
+    .vat-details {
+        font-weight: bold;
+        background-color: #f8f9fa;
+    }
+}
+/* Job Card Styles */
+.job-card {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+
+.job-card-header {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #2a2a72;
+    padding-bottom: 10px;
+}
+
+.job-card-info {
+    margin-bottom: 15px;
+}
+
+.job-card-signature {
+    margin-top: 50px;
+    border-top: 1px solid #000;
+    width: 250px;
+}
+/* === App-wide: full screen and sidebar layout === */
+html, body { height: 100%; }
+.container { max-width: 100% !important; } /* make it full-width */
+nav.navbar { display: none !important; }  /* hide all top navbars */
+
+/* Fixed left sidebar */
+.app-sidebar {
+  position: fixed;
+  left: 0; top: 0;
+  height: 100vh; width: 240px;
+  background: linear-gradient(180deg, var(--primary-blue), var(--secondary-blue));
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  display: flex; flex-direction: column;
+  z-index: 1020; /* below Bootstrap modal (1055) */
+}
+.sidebar-brand {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 700; font-size: 1.05rem;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+.sidebar-brand i { color: var(--accent); }
+.sidebar-nav { padding: 8px; overflow-y: auto; }
+.nav-btn {
+  width: 100%; border: 0; background: transparent; cursor: pointer;
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  color: #e9f2ff; padding: 10px 12px; border-radius: 10px;
+}
+.nav-btn i { width: 20px; text-align: center; }
+.nav-btn:hover { background: rgba(255,255,255,0.12); }
+.nav-btn.active { background: rgba(0,0,0,0.25); color: #fff; }
+.nav-btn.danger {
+  margin-top: 8px; background: rgba(220,53,69,.15); color:#fff;
+  border: 1px solid rgba(220,53,69,.4);
+}
+.nav-btn.danger:hover { filter: brightness(1.05); }
+
+.sidebar-spacer { flex: 1 1 auto; }
+.sidebar-user {
+  padding: 10px 12px; font-size: .9rem;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  color: #d5e6ff;
+}
+.sidebar-user .name { font-weight: 600; color: #fff; }
+
+/* Content shift while logged in */
+body:not(.login-page) .page {
+  margin-left: 240px;
+  min-height: 100vh;
+}
+body:not(.login-page) .page .container { padding-top: 16px; padding-bottom: 24px; }
+
+/* Hide sidebar on login screen */
+body.login-page .app-sidebar { display: none; }
+
+/* Responsive collapse */
+@media (max-width: 992px) {
+  .app-sidebar { width: 72px; }
+  .nav-btn span, .sidebar-user, .sidebar-brand span { display: none; }
+  body:not(.login-page) .page { margin-left: 72px; }
+}
+
+/* Ensure modals overlay above sidebar */
+.modal { z-index: 2000; }
+/* ===== Login Animation Overlay ===== */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 25, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  animation: overlayFadeIn 200ms ease both;
+}
+.auth-overlay.show { display: flex; }
+
+.auth-card {
+  width: min(520px, 92vw);
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+#authSteps .auth-step span { color: #2b2b2b; }
+#authSteps .auth-step.active span { font-weight: 600; color: var(--primary-blue); }
+#authSteps .auth-step.done span { color: #198754; }
+#authSteps .auth-step.fail span { color: #dc3545; }
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Prefer-reduced-motion: fewer animations */
+@media (prefers-reduced-motion: reduce) {
+  .auth-overlay { animation: none; }
+  .progress-bar { transition: none !important; }
+}

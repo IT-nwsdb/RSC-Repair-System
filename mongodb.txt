@@ -1,0 +1,1 @@
+mongodb+srv://osahanwicksenevirathne:<db_password>@cluster0.ugczmbk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0

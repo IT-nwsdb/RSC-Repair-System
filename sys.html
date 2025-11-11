@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>RSC Repair System</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="styles.css"/>
+
+    <!-- Firebase SDKs (compat) -->
+     <!-- PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+<!-- Firebase Functions (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+</head>
+<body class="login-page" id="loginPage">
+  <!-- Left Sidebar (global) -->
+  <div class="app-sidebar" id="appSidebar">
+    <div class="sidebar-brand">
+      <i class="fas fa-screwdriver-wrench"></i>
+      <span>RSC Repair System</span>
+    </div>
+    <div class="sidebar-nav">
+      <button class="nav-btn" data-target="repairDashboard" title="Dashboard">
+        <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+      </button>
+      <button class="nav-btn" data-target="receivedItemsPage" title="Received Items">
+        <i class="fas fa-box"></i><span>Received Items</span>
+      </button>
+      <button class="nav-btn" data-target="committeeApprovalPage" title="Committee Approval">
+        <i class="fas fa-check-circle"></i><span>Committee Approval</span>
+      </button>
+      <button class="nav-btn" data-target="systemTrackingPage" title="System Tracking">
+        <i class="fas fa-search"></i><span>System Tracking</span>
+      </button>
+      <button class="nav-btn" data-bs-toggle="modal" data-bs-target="#fileTrackingModal" title="File Tracking">
+        <i class="fas fa-folder-open"></i><span>File Tracking</span>
+      </button>
+      <button class="nav-btn" data-target="jobCardPage" title="Job Card">
+        <i class="fas fa-id-card"></i><span>Job Card</span>
+      </button>
+      <button class="nav-btn" data-target="devOptionsPage" title="Developer Options">
+        <i class="fas fa-code"></i><span>Developer Options</span>
+      </button>
+
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-user">
+        <div class="small">Welcome</div>
+        <div id="sidebarCurrentAdmin" class="name">Admin</div>
+      </div>
+      <button class="nav-btn danger" id="sidebarLogout" title="Logout">
+        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Login Page -->
+  <div class="page active" id="login">
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+      <div class="login-card" style="width: 100%; max-width: 450px;">
+        <div class="text-center mb-4">
+          <h1 class="login-title" style="color: var(--accent);">
+            <i class="fas fa-screwdriver-wrench me-2"></i>RSC Repair System
+          </h1>
+          <p class="login-subtitle">Admin Login Portal</p>
+        </div>
+
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="username" class="form-label">Admin Username</label>
+            <input type="text" class="form-control" id="username" required/>
+          </div>
+
+          <div class="mb-3 password-input-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control password-with-icon" id="password" required/>
+            <button type="button" class="password-toggle" id="togglePassword">
+              <i class="fas fa-eye-slash"></i>
+            </button>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100" style="background: var(--primary-blue);">
+            <i class="fas fa-sign-in-alt me-2"></i>Login
+          </button>
+
+          <div class="text-center mt-3">
+            <small class="tls-indicator">
+              <i class="fas fa-lock"></i> Secure TLS 1.3 Connection
+            </small>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Repair Dashboard -->
+  <div class="page" id="repairDashboard">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container">
+        <div class="d-flex align-items-center">
+          <a class="navbar-brand me-3" href="#">
+            <i class="fas fa-screwdriver-wrench me-2"></i>RSC Repair System
+          </a>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary" onclick="showPage('receivedItemsPage')">
+              <i class="fas fa-box me-1"></i> Received Items
+            </button>
+            <button class="btn btn-sm btn-outline-success" onclick="showPage('committeeApprovalPage')">
+              <i class="fas fa-check-circle me-1"></i> Committee Approval
+            </button>
+            <button class="btn btn-sm btn-outline-info" onclick="showPage('systemTrackingPage')">
+              <i class="fas fa-search me-1"></i> System Tracking
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#fileTrackingModal">
+              <i class="fas fa-folder-open me-1"></i> File Tracking
+            </button>
+            <button class="btn btn-sm btn-outline-warning" onclick="showPage('jobCardPage')">
+              <i class="fas fa-id-card me-1"></i> Job Card
+            </button>
+          </div>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="#" onclick="showPage('repairDashboard')">
+                <i class="fas fa-tachometer-alt me-1"></i> Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('devOptionsPage')">
+                <i class="fas fa-code me-1"></i> DEV.OPTN
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="logout()">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <div class="dashboard-header rounded p-3 mb-4">
+        <h2><i class="fas fa-tools me-2"></i>Repair Management</h2>
+        <p class="mb-0">Welcome back, <span id="currentAdmin"></span></p>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="bg-white rounded p-4 shadow-sm mb-4">
+            <h4 class="mb-4"><i class="fas fa-tools me-2"></i>New Repair Entry</h4>
+
+            <form id="repairForm">
+              <div class="form-section mb-4 pb-3">
+                <h5><i class="fas fa-user me-2"></i>Customer Information</h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Employee Name</label>
+                    <input type="text" class="form-control" id="repairEmployeeName" required/>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Region</label>
+                    <select class="form-select" id="repairRegion" required>
+                      <option value="" selected disabled>Select Region</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Office</label>
+                    <select class="form-select" id="repairDistrict" required disabled>
+                      <option value="" selected disabled>Select Region First</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">PC Serial Number</label>
+                    <input type="text" class="form-control" id="repairPcSerialNumber" required/>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Job Number</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" id="repairJobNumber" required readonly/>
+                      <!-- Use unique generator -->
+                      <button type="button" class="btn btn-outline-secondary" onclick="reserveUniqueJobNumber()">
+                        <i class="fas fa-sync-alt"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Gate Pass No</label>
+                    <input type="text" class="form-control" id="repairGatePassNo"/>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section mb-4 pb-3">
+                <h5><i class="fas fa-exclamation-circle me-2"></i>Error Details</h5>
+                <div class="mb-3">
+                  <label class="form-label">Description of Problem</label>
+                  <textarea class="form-control" id="repairErrorDetails" rows="3" required></textarea>
+                </div>
+              </div>
+
+              <div class="form-section mb-4 pb-3">
+                <h5><i class="fas fa-exchange-alt me-2"></i>Replaced Items</h5>
+
+                <!-- Main Item -->
+                <div class="mb-4">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label">Item Replaced</label>
+                      <select class="form-select repair-item-select">
+                        <option value="" selected disabled>Select Item</option>
+                        <option value="ram">RAM</option>
+                        <option value="hard disk">Hard Disk</option>
+                        <option value="ssd">SSD</option>
+                        <option value="motherboard">Motherboard</option>
+                        <option value="battery">Battery</option>
+                        <option value="power supply">Power Supply</option>
+                        <option value="graphic card">Graphic Card</option>
+                        <option value="other">Other</option>
+                      </select>
+                      <div class="repair-other-item-input mt-2" style="display: none;">
+                        <input type="text" class="form-control" placeholder="Enter item name"/>
+                      </div>
+                      <button type="button" class="btn btn-link mt-1" onclick="showReceivedItemsModal(this)">
+                        <i class="fas fa-search me-1"></i> Select from received items
+                      </button>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-check mb-3">
+                        <input class="form-check-input item-received-check" type="checkbox"/>
+                        <label class="form-check-label"> Item has been received </label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">New Serial Number</label>
+                      <select class="form-select repair-new-serial" disabled>
+                        <option value="" selected disabled>Select Serial Number</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Old Serial Number</label>
+                      <input type="text" class="form-control repair-old-serial"/>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Unit Price (Rs)</label>
+                      <input type="number" class="form-control repair-unit-price" min="0" step="0.01" disabled/>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Quantity</label>
+                      <input type="number" class="form-control repair-quantity" min="1" value="1" disabled/>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Total Price (Rs)</label>
+                      <input type="text" class="form-control repair-total-price" readonly disabled/>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Additional Items Container -->
+                <div id="additionalItemsContainer"></div>
+
+                <!-- Add Item Button -->
+                <div class="d-flex justify-content-end">
+                  <button type="button" class="btn btn-outline-primary" id="addItemBtn">
+                    <i class="fas fa-plus me-1"></i> Add Another Item
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-section mb-4 pb-3">
+                <h5><i class="far fa-calendar-alt me-2"></i>Service Dates</h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Service Date</label>
+                    <input type="date" class="form-control" id="repairServiceDate" required/>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Expected Return Date</label>
+                    <input type="date" class="form-control" id="repairReturnDate" required/>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-end gap-2">
+                <button type="reset" class="btn btn-outline-secondary">
+                  <i class="fas fa-times me-1"></i> Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save me-1"></i> Submit Repair
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="bg-white rounded p-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4><i class="far fa-calendar-check me-2"></i>Upcoming Returns</h4>
+              <span class="badge bg-primary">Next 4 Weeks</span>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-primary">
+                  <tr>
+                    <th>Customer</th>
+                    <th>Component</th>
+                    <th>Days Left</th>
+                  </tr>
+                </thead>
+                <tbody id="upcomingReturnsTable"></tbody>
+              </table>
+            </div>
+
+            <button class="btn btn-outline-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#repairsModal">
+              <i class="fas fa-history me-1"></i> View All Repairs
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Repairs Modal -->
+    <div class="modal fade" id="repairsModal" tabindex="-1">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="fas fa-history me-2"></i>All Repair Records</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <!-- Added Job No column -->
+                <thead class="table-primary">
+                  <tr>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Job No</th>
+                    <th>PC Serial</th>
+                    <th>Components</th>
+                    <th>Status</th>
+                    <th>Return Date</th>
+                    <th>Total (Rs)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="allRepairsTable"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Repair Modal -->
+   <!-- Edit Repair Modal (with Replaced Items) -->
+<div class="modal fade" id="editRepairModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Repair</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="editRepairForm" class="g-3">
+          <!-- Customer Information -->
+          <div class="form-section mb-4 pb-3">
+            <h5><i class="fas fa-user me-2"></i>Customer Information</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Job Number</label>
+                <input type="text" class="form-control" id="editRepairJobNumber" readonly/>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Employee Name</label>
+                <input type="text" class="form-control" id="editRepairEmployeeName" required/>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Region</label>
+                <select class="form-select" id="editRepairRegion" required>
+                  <option value="" disabled selected>Select Region</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Office</label>
+                <select class="form-select" id="editRepairDistrict" required disabled>
+                  <option value="" disabled selected>Select Region first</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">PC Serial Number</label>
+                <input type="text" class="form-control" id="editRepairPcSerial" required/>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Gate Pass No</label>
+                <input type="text" class="form-control" id="editRepairGatePassNo"/>
+              </div>
+            </div>
+          </div>
+<div class="col-md-6">
+  <label class="form-label">Customer Email(s)</label>
+  <input
+    type="text"
+    class="form-control"
+    id="repairCustomerEmails"
+    placeholder="name@example.com, another@example.com"
+    autocomplete="email"
+  />
+  <div class="form-text">Separate multiple emails with commas</div>
+</div>
+          <!-- Error Details -->
+          <div class="form-section mb-4 pb-3">
+            <h5><i class="fas fa-exclamation-circle me-2"></i>Error Details</h5>
+            <div class="mb-3">
+              <label class="form-label">Description of Problem</label>
+              <textarea class="form-control" id="editRepairErrorDetails" rows="3" required></textarea>
+            </div>
+          </div>
+
+          <!-- Replaced Items -->
+          <div class="form-section mb-4 pb-3">
+            <h5><i class="fas fa-exchange-alt me-2"></i>Replaced Items</h5>
+
+            <div id="editRepairItemsContainer"><!-- items injected by JS --></div>
+
+            <div class="d-flex justify-content-end">
+              <button type="button" class="btn btn-outline-primary" id="editAddItemBtn">
+                <i class="fas fa-plus me-1"></i> Add Another Item
+              </button>
+            </div>
+          </div>
+
+          <!-- Service Dates -->
+          <div class="form-section mb-4 pb-3">
+            <h5><i class="far fa-calendar-alt me-2"></i>Service Dates</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Service Date</label>
+                <input type="date" class="form-control" id="editRepairServiceDate" required/>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Expected Return Date</label>
+                <input type="date" class="form-control" id="editRepairReturnDate" required/>
+              </div>
+              <div class="col-12">
+                <div class="form-check mt-2">
+                  <input class="form-check-input" type="checkbox" id="editRepairCompleted"/>
+                  <label class="form-check-label" for="editRepairCompleted">Mark as Completed</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" id="editRepairSaveBtn">
+          <i class="fas fa-save me-1"></i> Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Received Items Selection Modal -->
+    <div class="modal fade" id="receivedItemsModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="fas fa-box me-2"></i>Select Received Item</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <div class="input-group">
+                <input type="text" class="form-control" id="receivedItemsModalSearch" placeholder="Search by item name or serial"/>
+                <button class="btn btn-outline-secondary" type="button" id="receivedItemsModalSearchBtn">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover received-items-table">
+                <thead class="table-primary">
+                  <tr>
+                    <th>Item Name</th>
+                    <th>Serial Number</th>
+                    <th>Invoice #</th>
+                    <th>File #</th>
+                    <th>PO #</th>
+                    <th>Price (Rs)</th>
+                    <th>Qty</th>
+                    <th>Warranty</th>
+                    <th>Supplier</th>
+                  </tr>
+                </thead>
+                <tbody id="receivedItemsModalTable"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Received Items Page -->
+  <div class="page" id="receivedItemsPage">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container">
+        <div class="d-flex align-items-center">
+          <a class="navbar-brand me-3" href="#">
+            <i class="fas fa-screwdriver-wrench me-2"></i>RSC Repair System
+          </a>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary active">
+              <i class="fas fa-box me-1"></i> Received Items
+            </button>
+            <button class="btn btn-sm btn-outline-success" onclick="showPage('committeeApprovalPage')">
+              <i class="fas fa-check-circle me-1"></i> Committee Approval
+            </button>
+            <button class="btn btn-sm btn-outline-info" onclick="showPage('systemTrackingPage')">
+              <i class="fas fa-search me-1"></i> System Tracking
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#fileTrackingModal">
+              <i class="fas fa-folder-open me-1"></i> File Tracking
+            </button>
+          </div>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('repairDashboard')">
+                <i class="fas fa-tachometer-alt me-1"></i> Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('devOptionsPage')">
+                <i class="fas fa-code me-1"></i> DEV.OPTN
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="logout()">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <div class="dashboard-header rounded p-3 mb-4">
+        <h2><i class="fas fa-box me-2"></i>Received Items Management</h2>
+        <p class="mb-0">Welcome back, <span id="receivedItemsAdmin"></span></p>
+      </div>
+
+      <div class="row">
+        <div class="col-md-5">
+          <div class="bg-white rounded p-4 shadow-sm mb-4">
+            <h4 class="mb-4"><i class="fas fa-plus-circle me-2"></i>Add Received Item</h4>
+
+            <form id="receivedItemForm">
+              <div class="mb-3">
+                <label class="form-label">Item Name</label>
+                <select class="form-select" id="receivedItemName" required>
+                  <option value="" selected disabled>Select Item</option>
+                  <option value="ram">RAM</option>
+                  <option value="hard disk">Hard Disk</option>
+                  <option value="ssd">SSD</option>
+                  <option value="motherboard">Motherboard</option>
+                  <option value="battery">Battery</option>
+                  <option value="power supply">Power Supply</option>
+                  <option value="graphic card">Graphic Card</option>
+                  <option value="other">Other</option>
+                </select>
+                <div class="mt-2" id="otherItemInput" style="display: none;">
+                  <input type="text" class="form-control" id="otherItemName" placeholder="Enter item name"/>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Primary Serial Number</label>
+                <input type="text" class="form-control" id="receivedItemSerial" required/>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Invoice Number</label>
+                <input type="text" class="form-control" id="receivedItemInvoice" required/>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">File Number</label>
+                <input type="text" class="form-control" id="receivedItemFileNumber"/>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">PO Number</label>
+                <input type="text" class="form-control" id="receivedItemPONumber"/>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Warranty Period (Months)</label>
+                <input type="number" class="form-control" id="receivedItemWarranty" min="1" value="12" required/>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Supplier Name</label>
+                <input type="text" class="form-control" id="receivedItemSupplier" required/>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Unit Price (Rs)</label>
+                <input type="number" class="form-control" id="receivedItemPrice" min="0" step="0.01" required/>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Quantity</label>
+                <input type="number" class="form-control" id="receivedItemQuantity" min="1" value="1" required/>
+              </div>
+
+              <div id="serialNumbersContainer" class="serial-numbers-container">
+                <label class="form-label">Additional Serial Numbers</label>
+                <div id="additionalSerialNumbers"></div>
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addSerialNumberField()">
+                  <i class="fas fa-plus me-1"></i> Add Serial Number
+                </button>
+              </div>
+
+              <div class="mb-3 storage-capacity" id="storageCapacityField">
+                <label class="form-label">Storage Capacity (GB)</label>
+                <input type="number" class="form-control" id="receivedItemCapacity" min="1"/>
+              </div>
+
+              <div class="d-flex justify-content-end gap-2 mt-3">
+                <button type="reset" class="btn btn-outline-secondary">
+                  <i class="fas fa-times me-1"></i> Clear
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-plus me-1"></i> Add Item
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-md-7">
+          <div class="bg-white rounded p-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4><i class="fas fa-list me-2"></i>Received Items List</h4>
+              <div class="input-group" style="width: 300px;">
+                <input type="text" class="form-control" id="receivedItemsSearch" placeholder="Search by item name"/>
+                <button class="btn btn-outline-secondary" type="button" id="receivedItemsSearchBtn">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-primary">
+                  <tr>
+                    <th>Item Name</th>
+                    <th>Serial Number</th>
+                    <th>Invoice #</th>
+                    <th>File #</th>
+                    <th>PO #</th>
+                    <th>Warranty</th>
+                    <th>Price (Rs)</th>
+                    <th>Qty</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="receivedItemsTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Committee Approval Page -->
+  <div class="page" id="committeeApprovalPage">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container">
+        <div class="d-flex align-items-center">
+          <a class="navbar-brand me-3" href="#">
+            <i class="fas fa-screwdriver-wrench me-2"></i>RSC Repair System
+          </a>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary" onclick="showPage('receivedItemsPage')">
+              <i class="fas fa-box me-1"></i> Received Items
+            </button>
+            <button class="btn btn-sm btn-outline-success active">
+              <i class="fas fa-check-circle me-1"></i> Committee Approval
+            </button>
+            <button class="btn btn-sm btn-outline-info" onclick="showPage('systemTrackingPage')">
+              <i class="fas fa-search me-1"></i> System Tracking
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#fileTrackingModal">
+              <i class="fas fa-folder-open me-1"></i> File Tracking
+            </button>
+          </div>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('repairDashboard')">
+                <i class="fas fa-tachometer-alt me-1"></i> Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('devOptionsPage')">
+                <i class="fas fa-code me-1"></i> DEV.OPTN
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="logout()">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <div class="dashboard-header rounded p-3 mb-4">
+        <h2><i class="fas fa-check-circle me-2"></i>Committee Approval</h2>
+        <p class="mb-0">Welcome back, <span id="committeeAdmin"></span></p>
+      </div>
+
+      <div class="bg-white rounded p-4 shadow-sm mb-4">
+        <h4 class="mb-4"><i class="fas fa-file-alt me-2"></i>New Committee Approval</h4>
+
+        <form id="committeeForm">
+          <!-- Basic Information -->
+          <div class="form-section mb-4 pb-3">
+            <h5><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-control" id="approvalDate" required/>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">VAT Percentage (%)</label>
+                <input type="number" class="form-control" id="vatPercentage" min="0" max="100" step="0.01" value="0"/>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">MR Number</label>
+                <input type="text" class="form-control" id="approvalMrNumber" placeholder="Enter MR No"/>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">PR Number</label>
+                <input type="text" class="form-control" id="approvalPrNumber" placeholder="Enter PR No"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Link Job Cards -->
+          <div class="form-section mb-4 pb-3">
+            <h5><i class="fas fa-id-card me-2"></i>Link Job Card(s) <small class="text-muted">(Optional)</small></h5>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Select Job Card Number(s)</label>
+                <select id="approvalLinkedJobCards" class="form-select" multiple size="6"></select>
+                <div class="form-text">Hold Ctrl to select multiple or Delete.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Items for Approval -->
+          <div class="form-section mb-4 pb-3">
+            <h5><i class="fas fa-list me-2"></i>Items for Approval</h5>
+
+            <div class="table-responsive mb-3">
+              <table class="table" id="approvalItemsTable">
+                <thead style="display: none;">
+                  <tr>
+                    <th>No</th>
+                    <th>Item Description</th>
+                    <th>Region</th>
+                    <th>Section</th>
+                    <th>Cost Center</th>
+                    <th>Qty</th>
+                    <th>Unit Rate (Rs.)</th>
+                    <th>Amount (Rs.)</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="approvalItemsBody"></tbody>
+              </table>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">Item Description</label>
+                <input type="text" class="form-control" id="newItemDescription"/>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Region</label>
+                <select class="form-select" id="newItemRegion">
+                  <option value="" selected disabled>Select Region</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Section</label>
+                <select class="form-select" id="newItemSection" disabled>
+                  <option value="" selected disabled>Select Region First</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Cost Center</label>
+                <input type="text" class="form-control" id="newItemCostCenter"/>
+              </div>
+              <div class="col-md-1">
+                <label class="form-label">Qty</label>
+                <input type="number" class="form-control" id="newItemQty" min="1" value="1"/>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Unit Rate (Rs.)</label>
+                <input type="number" class="form-control" id="newItemUnitRate" min="0" step="0.01"/>
+              </div>
+              <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-primary" id="addApprovalItemBtn">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section mb-4 pb-3">
+            <h5><i class="fas fa-users me-2"></i>Committee Members</h5>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Chairman Name</label>
+                <select class="form-select" id="chairmanName">
+                  <option value="" selected disabled>Select Chairman</option>
+                  <option value="DGM (C)">DGM (C)</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="col-md-4" id="otherChairmanNameWrap" style="display: none;">
+                <label class="form-label">Other Chairman Name</label>
+                <input type="text" class="form-control" id="otherChairmanName" placeholder="Enter chairman name"/>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Member Name</label>
+                <input type="text" class="form-control" id="memberName"/>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Other Member Name</label>
+                <input type="text" class="form-control" id="otherMemberName"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button type="reset" class="btn btn-outline-secondary">
+              <i class="fas fa-times me-1"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-1"></i> Submit Approval
+            </button>
+            <button type="button" class="btn btn-success" id="printApprovalBtn">
+              <i class="fas fa-print me-1"></i> Print Report
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h4><i class="fas fa-history me-2"></i>Previous Approvals</h4>
+        <div class="d-flex align-items-center gap-2">
+          <div class="input-group" style="width: 220px;">
+            <input type="text" class="form-control" id="approvalSearch" placeholder="0000-00-00"/>
+            <button class="btn btn-outline-secondary" type="button" id="approvalSearchBtn">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          <select class="form-select" id="approvalLocationFilter" style="min-width: 220px;">
+            <option value="">All Locations</option>
+          </select>
+          <button class="btn btn-outline-primary" id="toggleApprovalsViewBtn">View All</button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-primary">
+            <tr>
+              <th>Date</th>
+              <th>Total Amount</th>
+              <th>Chairman</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="previousApprovalsTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Tracking Page -->
+  <div class="page" id="systemTrackingPage">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container">
+        <div class="d-flex align-items-center">
+          <a class="navbar-brand me-3" href="#">
+            <i class="fas fa-screwdriver-wrench me-2"></i>RSC Repair System
+          </a>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary" onclick="showPage('receivedItemsPage')">
+              <i class="fas fa-box me-1"></i> Received Items
+            </button>
+            <button class="btn btn-sm btn-outline-success" onclick="showPage('committeeApprovalPage')">
+              <i class="fas fa-check-circle me-1"></i> Committee Approval
+            </button>
+            <button class="btn btn-sm btn-outline-info active">
+              <i class="fas fa-search me-1"></i> System Tracking
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#fileTrackingModal">
+              <i class="fas fa-folder-open me-1"></i> File Tracking
+            </button>
+          </div>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('repairDashboard')">
+                <i class="fas fa-tachometer-alt me-1"></i> Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('devOptionsPage')">
+                <i class="fas fa-code me-1"></i> DEV.OPTN
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="logout()">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <div class="dashboard-header rounded p-3 mb-4">
+        <h2><i class="fas fa-search me-2"></i>System Tracking</h2>
+        <p class="mb-0">Track product history by serial number</p>
+      </div>
+
+      <div class="bg-white rounded p-4 shadow-sm mb-4">
+        <h4 class="mb-4"><i class="fas fa-barcode me-2"></i>Search by PC Serial Number</h4>
+
+        <div class="row">
+          <div class="col-md-8">
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" id="systemTrackingSearch" placeholder="Enter PC serial number"/>
+              <button class="btn btn-primary" type="button" id="systemTrackingSearchBtn">
+                <i class="fas fa-search me-1"></i> Search
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="systemTrackingResults" style="display: none;">
+          <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">PC Information</h5>
+            </div>
+            <div class="card-body">
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <p><strong>PC Serial Number:</strong> <span id="trackingPcSerial"></span></p>
+                  <p><strong>Total Repairs:</strong> <span id="trackingRepairCount"></span></p>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"><strong>Select Item Serial Number:</strong></label>
+                  <select class="form-select" id="itemSerialDropdown" onchange="updateItemDetails()">
+                    <option value="" selected disabled>Select an item serial</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="card mt-3">
+                <div class="card-header bg-secondary text-white">
+                  <h6 class="mb-0">Selected Item Details</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p><strong>Item Name:</strong> <span id="trackingItemName"></span></p>
+                      <p><strong>Item Serial Number:</strong> <span id="trackingItemSerial"></span></p>
+                      <p><strong>Invoice Number:</strong> <span id="trackingInvoice"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                      <p><strong>Warranty Period:</strong> <span id="trackingWarranty"></span> months</p>
+                      <p><strong>Supplier:</strong> <span id="trackingSupplier"></span></p>
+                      <p><strong>Unit Price:</strong> Rs <span id="trackingPrice"></span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header bg-info text-white">
+              <h5 class="mb-0">Repair History</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Date</th>
+                      <th>Employee</th>
+                      <th>Region/District</th>
+                      <th>Problem</th>
+                      <th>Items Replaced</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="trackingHistoryTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="systemTrackingNoResults" class="alert alert-warning mt-3" style="display: none;">
+          <i class="fas fa-exclamation-triangle me-2"></i>No results found for this serial number.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEV Options Page -->
+  <div class="page" id="devOptionsPage">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container">
+        <div class="d-flex align-items-center">
+          <a class="navbar-brand me-3" href="#">
+            <i class="fas fa-screwdriver-wrench me-2"></i>RSC Repair System
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDev">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDev">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('repairDashboard')">
+                <i class="fas fa-tachometer-alt me-1"></i> Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="#" onclick="showPage('devOptionsPage')">
+                <i class="fas fa-code me-1"></i> DEV.OPTN
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="logout()">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <div class="dashboard-header rounded p-3 mb-4">
+        <h2><i class="fas fa-code me-2"></i>Developer Options</h2>
+        <p class="mb-0">Add Regions and Offices/Sections with Cost Centers. Only newly added places are shown here.</p>
+      </div>
+
+      <div class="bg-white rounded p-4 shadow-sm mb-4">
+        <h4 class="mb-3"><i class="fas fa-plus-circle me-2"></i>Add Region + Office/Section</h4>
+        <form id="customLocationForm" class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Region</label>
+            <input list="regionDatalist" type="text" class="form-control" id="devRegionInput" placeholder="e.g., Head Office" required/>
+            <datalist id="regionDatalist"></datalist>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Office / Section</label>
+            <input type="text" class="form-control" id="devSectionInput" placeholder="e.g., IT" required/>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Cost Center</label>
+            <input type="text" class="form-control" id="devCostCenterInput" placeholder="e.g., 4000" required/>
+          </div>
+          <div class="col-md-1 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-save me-1"></i> Save
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="bg-white rounded p-4 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="mb-0"><i class="fas fa-list me-2"></i>Custom Locations (Newly Added)</h4>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-primary">
+              <tr>
+                <th>Region</th>
+                <th>Office / Section</th>
+                <th>Cost Center</th>
+                <th style="width: 100px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customLocationsBody">
+              <tr><td colspan="4" class="text-center text-muted">No custom locations added yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- File Tracking Modal -->
+  <div class="modal fade" id="fileTrackingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-folder-open me-2"></i>File Tracking</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group mb-3">
+            <input type="text" id="fileTrackingSearchInput" class="form-control" placeholder="Enter file number"/>
+            <button class="btn btn-primary" type="button" id="fileTrackingSearchBtn">
+              <i class="fas fa-search me-1"></i> Search
+            </button>
+          </div>
+          <div id="fileTrackingSearchResult" class="mb-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Job Card Menu Page -->
+  <div class="page" id="jobCardPage">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container">
+        <div class="d-flex align-items-center">
+          <a class="navbar-brand me-3" href="#">
+            <i class="fas fa-screwdriver-wrench me-2"></i>RSC Repair System
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavJobCard">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavJobCard">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('repairDashboard')">
+                <i class="fas fa-tachometer-alt me-1"></i> Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('devOptionsPage')">
+                <i class="fas fa-code me-1"></i> DEV.OPTN
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="logout()">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <div class="dashboard-header rounded p-3 mb-4">
+        <h2><i class="fas fa-id-card me-2"></i>Job Card</h2>
+        <p class="mb-0">Choose an action</p>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body text-center">
+              <button class="btn btn-primary" style="min-width:220px" onclick="showPage('jobCardListPage')">
+                <i class="fas fa-file-alt me-1"></i> Job Card
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body text-center">
+              <button class="btn btn-info" style="min-width:220px" onclick="showPage('jobCardHistoryPage')">
+                <i class="fas fa-history me-1"></i> Job Card History
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Job Card List Page -->
+  <div class="page" id="jobCardListPage">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container">
+        <div class="d-flex align-items-center">
+          <a class="navbar-brand me-3" href="#">
+            <i class="fas fa-screwdriver-wrench me-2"></i>RSC Repair System
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavJobCardList">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavJobCardList">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('jobCardPage')">
+                <i class="fas fa-arrow-left me-1"></i> Back
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('repairDashboard')">
+                <i class="fas fa-tachometer-alt me-1"></i> Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('devOptionsPage')">
+                <i class="fas fa-code me-1"></i> DEV.OPTN
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="logout()">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <div class="dashboard-header rounded p-3 mb-4">
+        <h2><i class="fas fa-file-alt me-2"></i>Job Card List</h2>
+        <p class="mb-0">Only entries with a Job Number are shown. Date shows submitted time.</p>
+      </div>
+
+      <div class="bg-white rounded p-4 shadow-sm">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-primary">
+              <tr>
+                <th>Job Number</th>
+                <th>Submitted At</th>
+                <th>PC Serial</th>
+                <th>Region</th>
+                <th>Office</th>
+                <th>Gate Pass No</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="jobCardEntriesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Job Card History Page -->
+  <div class="page" id="jobCardHistoryPage">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container">
+        <div class="d-flex align-items-center">
+          <a class="navbar-brand me-3" href="#">
+            <i class="fas fa-screwdriver-wrench me-2"></i>RSC Repair System
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavJobCardHist">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavJobCardHist">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('jobCardPage')">
+                <i class="fas fa-arrow-left me-1"></i> Back
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('repairDashboard')">
+                <i class="fas fa-tachometer-alt me-1"></i> Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showPage('devOptionsPage')">
+                <i class="fas fa-code me-1"></i> DEV.OPTN
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="logout()">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <div class="dashboard-header rounded p-3 mb-4">
+        <h2><i class="fas fa-history me-2"></i>Job Card History</h2>
+        <p class="mb-0">Search by Job Card Number</p>
+      </div>
+
+      <div class="bg-white rounded p-4 shadow-sm">
+        <div class="input-group mb-3" style="max-width: 420px;">
+          <input type="text" class="form-control" id="jobCardSearchInput" placeholder="Enter Job Card Number (e.g., RSC/2025/1234)"/>
+          <button class="btn btn-primary" type="button" id="jobCardSearchBtn">
+            <i class="fas fa-search me-1"></i> Search
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-primary">
+              <tr>
+                <th>Region</th>
+                <th>Office</th>
+                <th>PC Serial Number</th>
+                <th>Gate Pass No</th>
+                <th>Description of Problem</th>
+                <th>Service Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="jobCardHistoryTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Animation Overlay -->
+  <div id="authOverlay" class="auth-overlay" aria-hidden="true">
+    <div class="auth-card shadow-lg">
+      <div class="d-flex align-items-center mb-3">
+        <div class="spinner-border text-info me-2" role="status" aria-hidden="true"></div>
+        <h5 class="mb-0">Signing you in...</h5>
+      </div>
+
+      <div class="progress mb-3" style="height: 10px;">
+        <div id="authProgress" class="progress-bar progress-bar-striped progress-bar-animated bg-info" style="width: 0%;"></div>
+      </div>
+
+      <ul class="list-unstyled mb-0" id="authSteps">
+        <li class="auth-step d-flex align-items-center mb-2" data-step="1">
+          <i class="fa-solid fa-circle-notch fa-spin me-2 icon-pending d-none"></i>
+          <i class="fa-solid fa-check-circle text-success me-2 icon-done d-none"></i>
+          <i class="fa-solid fa-circle-xmark text-danger me-2 icon-fail d-none"></i>
+          <span>Authenticating credentials</span>
+        </li>
+        <li class="auth-step d-flex align-items-center mb-2" data-step="2">
+          <i class="fa-solid fa-circle-notch fa-spin me-2 icon-pending d-none"></i>
+          <i class="fa-solid fa-check-circle text-success me-2 icon-done d-none"></i>
+          <i class="fa-solid fa-circle-xmark text-danger me-2 icon-fail d-none"></i>
+          <span>Establishing secure session (TLS 1.3)</span>
+        </li>
+        <li class="auth-step d-flex align-items-center mb-2" data-step="3">
+          <i class="fa-solid fa-circle-notch fa-spin me-2 icon-pending d-none"></i>
+          <i class="fa-solid fa-check-circle text-success me-2 icon-done d-none"></i>
+          <i class="fa-solid fa-circle-xmark text-danger me-2 icon-fail d-none"></i>
+          <span>Connecting to database</span>
+        </li>
+        <li class="auth-step d-flex align-items-center mb-2" data-step="4">
+          <i class="fa-solid fa-circle-notch fa-spin me-2 icon-pending d-none"></i>
+          <i class="fa-solid fa-check-circle text-success me-2 icon-done d-none"></i>
+          <i class="fa-solid fa-circle-xmark text-danger me-2 icon-fail d-none"></i>
+          <span>Syncing data</span>
+        </li>
+        <li class="auth-step d-flex align-items-center" data-step="5">
+          <i class="fa-solid fa-circle-notch fa-spin me-2 icon-pending d-none"></i>
+          <i class="fa-solid fa-check-circle text-success me-2 icon-done d-none"></i>
+          <i class="fa-solid fa-circle-xmark text-danger me-2 icon-fail d-none"></i>
+          <span>Preparing dashboard</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- Job Card Quick Edit Modal -->
+<div class="modal fade" id="jobCardQuickEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-pen-to-square me-2"></i>Edit Job Card</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Job Number</label>
+          <input type="text" class="form-control" id="jobCardEditJobNumber" readonly />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">PC Serial</label>
+          <input type="text" class="form-control" id="jobCardEditPcSerial" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Region</label>
+          <select class="form-select" id="jobCardEditRegion" required>
+            <option value="" selected disabled>Select Region</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Office</label>
+          <select class="form-select" id="jobCardEditSection" required disabled>
+            <option value="" selected disabled>Select Region First</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Gate Pass No</label>
+          <input type="text" class="form-control" id="jobCardEditGatePassNo" />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="jobCardEditSaveBtn">
+          <i class="fas fa-save me-1"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Send Job Card Email Modal -->
+<div class="modal fade" id="sendEmailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-envelope me-2"></i>Send Job Card</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Selected recipients</label>
+          <div id="emailChips" class="d-flex flex-wrap gap-2"></div>
+        </div>
+
+        <div class="row g-2 align-items-center mb-3">
+          <div class="col-md-8">
+            <input type="email" class="form-control" id="manualEmail" placeholder="Add email and click Add" />
+          </div>
+          <div class="col-md-4 text-end">
+            <button class="btn btn-outline-primary" type="button" id="addEmailBtn">
+              <i class="fas fa-plus"></i> Add
+            </button>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Suggestions</label>
+          <div id="emailSuggestions" class="list-group"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="emailMessage">Message (optional)</label>
+          <textarea id="emailMessage" class="form-control" rows="3" placeholder="Message to include in the email"></textarea>
+        </div>
+
+        <div class="alert alert-info small">The Job Card will be attached as a PDF.</div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" type="button" id="sendEmailBtn">
+          <i class="fas fa-paper-plane me-1"></i> Send
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Bootstrap + App -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script defer src="core.js"></script>
+  <script defer src="ui.js"></script>
+</body>
+</html>
